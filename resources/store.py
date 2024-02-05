@@ -9,7 +9,7 @@ from flask import request
 
 blp = Blueprint('stores', __name__, description = 'Operation on store')
 
-@blp.route("/store/<string store_id>")
+@blp.route('/stores/<string:store_id>')
 class Store(MethodView):
     def get(self, store_id):
         try:
@@ -25,13 +25,13 @@ class Store(MethodView):
         except KeyError:
             abort(404, message='store not found')
 
+@blp.route('/stores')
 class StoresList(MethodView):
-    @blp.route('/stores')
+    
     def get(self):
         # return {"hot reloading" : "no"}
         return {"stores" : list(stores.values())}
 
-    @blp.route('/stores')  
     def post(self):
         req_json = request.get_data() # works ok
         req = json.loads(req_json)
