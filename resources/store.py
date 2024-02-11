@@ -3,10 +3,13 @@ import uuid
 import json
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
-from db import stores, items
+# from db import stores, items
 from flask import request
 from schemas import StoreSchema
+from models import StoreModel
+from db import db
 
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 blp = Blueprint('stores', __name__, description = 'Operation on store')
 
@@ -38,20 +41,17 @@ class StoresList(MethodView):
     @blp.arguments(StoreSchema)
     @blp.response(200, StoreSchema)
     def post(self, req):
-        # req_json = request.get_data() # works ok
-        # req = json.loads(req_json)
-        # return req['name']
-        # if 'name' not in req:
-        #     abort(404, message = 'Bad request. "name" must be included in JSON payload.')
-        for store in stores.values():
-            if req['name'] == store['name']:
-                abort(404, message = 'Bad request. store already exists.')
-        storeId = uuid.uuid4().hex
-        newStore = {**req, 'id' : storeId}
-        stores[storeId] = newStore
-        logging.info(req)
-        # return {"stores" : stores} , 201
+        newStore = StoreModel(**req)
+        try:
+            db.session.add(newStore)
+            db.session.commit()
+        except IntegrityError :
+            abort(400, message ="A store with that name already exists")
+        except SQLAlchemyError:
+            abort(500, message = 'An error occurred while inserting the item')
+        
         return newStore, 201
+
 
 # the blueprint way is a little awkward in my opinion, because it does not hold all related information in one class, 
 # insted holds only those methods with exact same endpoint/route

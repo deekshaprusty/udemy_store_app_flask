@@ -1,9 +1,14 @@
-from db import items
+# from db import items
 from flask import request
 from flask.views import MethodView   
 from flask_smorest import Blueprint, abort
 import uuid
 from schemas import ItemSchema, ItemUpdateSchema
+from models import ItemModel
+from db import db
+from sqlalchemy.exc import SQLAlchemyError
+import logging
+
 
 blp = Blueprint('items', __name__, description = 'Operations on items')
 
@@ -51,15 +56,17 @@ class ItemList(MethodView):
         # itemInfo = request.get_json()
         # if 'store_id' not in itemInfo or 'price' not in itemInfo or 'name' not in itemInfo:
         #     abort(400, message = 'bad request. Ensure store_id, price, name are included in JSON payload')
-        for item in items.values():
-            if itemInfo['name'] == item['name'] and itemInfo['store_id'] == item['store_id']:
-                abort(404, message='Item already exists')
+
 
         # storeId = itemInfo.get('store_id')
         # if storeId not in stores:
         #     return {'message': 'store not found'}, 404
+        logging.info(f' itemInfo - {itemInfo}')
+        newItem = ItemModel(**itemInfo)
+        try:
+            db.session.add(newItem)
+            db.session.commit()
+        except SQLAlchemyError:
+            abort(500, message='An error occurred while inserting the item')
 
-        itemId = itemId = uuid.uuid4().hex
-        newItem= {**itemInfo, 'id' : itemId}
-        items[itemId] = newItem
         return newItem, 201
