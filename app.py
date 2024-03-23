@@ -8,6 +8,7 @@ import json
 # from db import stores, items
 from resources.item import blp as ItemBlueprint
 from resources.store import blp as StoreBlueprint
+# from resources.tag import blp as TagBlueprint
 import models
 from db import db
 
@@ -24,6 +25,7 @@ from db import db
 # ]
 def create_app(db_url = None):
     app = Flask(__name__)
+    logging.info('Flask started :::::::::::::::')
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
@@ -50,9 +52,13 @@ def create_app(db_url = None):
 
     api.register_blueprint(ItemBlueprint)
     api.register_blueprint(StoreBlueprint)
+    # api.register_blueprint(TagBlueprint)
 
+    app.debug = True
     return app
 
+
+create_app()
 # @app.post('/store')
 # def create_store():
 #     req_json = request.get_json()
@@ -62,7 +68,9 @@ def create_app(db_url = None):
 
 
 # the below is not required. flask run takes settings from .flaskenv (also with that, we no longer need to start the server with each change. it gets updated automatically)
+# #Has not worked - the below would be required if you are debugging
 # if __name__ == "__main__":
+#     app = create_app()
 #     app.run(debug=True)
 
 # running instruction
@@ -82,3 +90,4 @@ def create_app(db_url = None):
 
 # Docker volume - hot reloading (the below is not working. needs work)
 # docker run -p 8080:5000 -w /app -v "C:\Users\prust\OneDrive\Documents\Deeksha\Flask_Projects\udemy_store:\app" flask-smorest-api
+
