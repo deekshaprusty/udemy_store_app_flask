@@ -22,9 +22,9 @@ class PlainStoreSchema(Schema):
     name = fields.Str(required=True)
     
     
-# class PlainTagSchema(Schema):
-#     id = fields.Integer(dump_only = True)
-#     name = fields.Str(required=True)
+class PlainTagSchema(Schema):
+    id = fields.Integer(dump_only = True)
+    name = fields.Str(required=True)
 
 class ItemSchema(PlainItemSchema):
     store_id = fields.Integer(required= True)
@@ -34,9 +34,9 @@ class ItemSchema(PlainItemSchema):
 
 class StoreSchema(PlainStoreSchema):
     items = fields.List( fields.Nested(PlainItemSchema()), dump_only = True)  # dump_only -> Only DB can dump(put) into this model, Not user #Load only - DB can load(take/bring it up) from the model
-#     tags = fields.List(fields.Nested(PlainTagSchema()), dump_only = True)
+    tags = fields.List(fields.Nested(PlainTagSchema()), dump_only = True)
 
-# class TagSchema(PlainTagSchema):
-#     # items = fields.List( fields.Nested(PlainItemSchema()), dump_only = True  ) #TODO is it dump_only ? No, I guess
-#     store_id = fields.Integer( load_only = True ) 
-#     stores = fields.List(fields.Nested(PlainStoreSchema()), dump_only = True)
+class TagSchema(PlainTagSchema):
+    # items = fields.List( fields.Nested(PlainItemSchema()), dump_only = True  ) #TODO is it dump_only ? No, I guess
+    store_id = fields.Integer( load_only = True ) 
+    store = fields.Nested(PlainStoreSchema(), dump_only=True)
