@@ -4,6 +4,7 @@ import sys
 
 class ItemModel(db.Model):
     __tablename__ = "items"
+    extend_existing=True
     print(f'Debugging : ItemModel ')
     sys.stdout.flush()
     id = db.Column(db.Integer, primary_key=True)
@@ -11,5 +12,4 @@ class ItemModel(db.Model):
     price = db.Column(db.Float(precision=2), unique=False, nullable = False )
     store_id = db.Column(db.Integer, db.ForeignKey("stores.id"), unique = False, nullable=False)
     store = db.relationship("StoreModel", back_populates="items", )
-    # tag_ids = db.Column(db.List)
-    # tags = db.relationship("Tags") #code for M to M
+    tags = db.relationship("TagModel", back_populates = "items", secondary = "items_tags") #code for M to M

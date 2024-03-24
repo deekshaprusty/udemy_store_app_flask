@@ -40,3 +40,10 @@ class TagSchema(PlainTagSchema):
     # items = fields.List( fields.Nested(PlainItemSchema()), dump_only = True  ) #TODO is it dump_only ? No, I guess
     store_id = fields.Integer( load_only = True ) 
     store = fields.Nested(PlainStoreSchema(), dump_only=True)
+
+class ItemTagSchema(Schema):
+    # id = fields.Int(dump_only=True)
+    message = fields.Str()
+    item = fields.Nested(ItemSchema)
+    tag = fields.Nested(TagSchema)
+    
