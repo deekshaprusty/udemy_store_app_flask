@@ -49,6 +49,12 @@ def create_app(db_url = None):
 
     jwt = JWTManager(app)
 
+    @jwt.additional_claims_loader
+    def add_claims_to_jwt(idenitity):
+        if idenitity == 6:
+            return {"is_admin" : True}
+        return {"is_admin" : False}
+
     @jwt.expired_token_loader
     def expired_tok_callback(jwt_header, jwt_payload):
         return (

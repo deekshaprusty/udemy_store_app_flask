@@ -9,7 +9,7 @@ from db import db
 from sqlalchemy.exc import SQLAlchemyError
 import logging
 import sys
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 
 blp = Blueprint('items', __name__, description = 'Operations on items')
 
@@ -26,6 +26,9 @@ class Item(MethodView):
     @jwt_required()
     @blp.response(200, ItemSchema)
     def delete(self, item_id):
+        jwt = get_jwt()
+        if not jwt.get("is_admin"):
+            abort(401, message = "only admin can delete")
         item = ItemModel.query.get_or_404(item_id)
         if item:
             db.session.delete(item)
