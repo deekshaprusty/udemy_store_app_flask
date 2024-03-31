@@ -37,9 +37,10 @@ class StoreSchema(PlainStoreSchema):
     tags = fields.List(fields.Nested(PlainTagSchema()), dump_only = True)
 
 class TagSchema(PlainTagSchema):
-    # items = fields.List( fields.Nested(PlainItemSchema()), dump_only = True  ) #TODO is it dump_only ? No, I guess
+    items = fields.List( fields.Nested(PlainItemSchema()), dump_only = True  ) #TODO is it dump_only ? No, I guess
     store_id = fields.Integer( load_only = True ) 
     store = fields.Nested(PlainStoreSchema(), dump_only=True)
+    
 
 class ItemTagSchema(Schema):
     # id = fields.Int(dump_only=True)
@@ -47,3 +48,7 @@ class ItemTagSchema(Schema):
     item = fields.Nested(ItemSchema)
     tag = fields.Nested(TagSchema)
     
+class UserSchema(Schema):
+    id = fields.Int(dump_only=True)
+    username = fields.Str(required=True)
+    pswd = fields.Str(required=True, load_only=True)  #since required is written here, can this schema be used for responding ??

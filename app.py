@@ -9,8 +9,10 @@ import json
 from resources.item import blp as ItemBlueprint
 from resources.store import blp as StoreBlueprint
 from resources.tag import blp as TagBlueprint
+from resources.user import bp as UserBlueprint
 import models
 from db import db
+from flask_jwt_extended import JWTManager
 
 
 
@@ -35,6 +37,7 @@ def create_app(db_url = None):
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv( "DATABASE_URL", "sqlite:///data.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["JWT_SECRET_KEY"] = "jose"
     try:
         db.init_app(app)
     except Exception as ex:
@@ -44,15 +47,19 @@ def create_app(db_url = None):
         raise ex
     api = Api(app)
 
+    jwt = JWTManager(app)
+
     # @app.before_first_request
     # def create_tables():
     with app.app_context():
+        import models
         db.create_all()
 
 
     api.register_blueprint(ItemBlueprint)
     api.register_blueprint(StoreBlueprint)
     api.register_blueprint(TagBlueprint)
+    api.register_blueprint(UserBlueprint)
 
     app.debug = True
     return app
