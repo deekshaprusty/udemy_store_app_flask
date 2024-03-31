@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_smorest import abort, Api
 import logging
 import uuid
@@ -48,6 +48,27 @@ def create_app(db_url = None):
     api = Api(app)
 
     jwt = JWTManager(app)
+
+    @jwt.expired_token_loader
+    def expired_tok_callback(jwt_header, jwt_payload):
+        return (
+            jsonify({"message" : "The token has expired.", "error":"token_expired"}), 401
+        )
+
+
+    @jwt.invalid_token_loader
+    def invalid_invalid_token(error):
+        return (
+            jsonify({"message" : "Signature verification failed", "error" : "invalid token"}), 401
+        )
+
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        return (
+            jsonify({ "message" : "request does not contain an access token",
+                "error" : "auth_required"
+                }), 401
+        )
 
     # @app.before_first_request
     # def create_tables():

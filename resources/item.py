@@ -9,7 +9,7 @@ from db import db
 from sqlalchemy.exc import SQLAlchemyError
 import logging
 import sys
-
+from flask_jwt_extended import jwt_required
 
 blp = Blueprint('items', __name__, description = 'Operations on items')
 
@@ -23,6 +23,7 @@ class Item(MethodView):
             item = ItemModel.query.get_or_404(item_id)
             return item
 
+    @jwt_required()
     @blp.response(200, ItemSchema)
     def delete(self, item_id):
         item = ItemModel.query.get_or_404(item_id)
@@ -32,6 +33,7 @@ class Item(MethodView):
         return {"message" : "item deleted"}
         # raise NotImplementedError("Deleting an item is not implemented")
 
+    @jwt_required()
     @blp.arguments(ItemUpdateSchema)
     @blp.response(200, ItemSchema)
     def put(self, updatedItem, item_id):
@@ -65,6 +67,7 @@ class ItemList(MethodView):
         # return list(items.values() )
         return ItemModel.query.all()
 
+    @jwt_required()
     @blp.arguments(ItemSchema)
     @blp.response(201, ItemSchema)
     def post(self, itemInfo):
